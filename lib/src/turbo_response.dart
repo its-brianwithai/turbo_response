@@ -430,7 +430,8 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   (s) => 'Success: ${s.result}',
   /// );
   /// ```
-  FutureOr<R?> whenSuccess<R>(FutureOr<R> Function(Success<T> ok) success) async =>
+  FutureOr<R?> whenSuccess<R>(
+          FutureOr<R> Function(Success<T> ok) success) async =>
       isSuccess ? await success(this as Success<T>) : null;
 
   /// Handles a failed response, returning a value.
@@ -564,7 +565,8 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   () => computeExpensiveDefault(),
   /// );
   /// ```
-  FutureOr<T> unwrapOrCompute(FutureOr<T> Function() defaultValue) async => switch (this) {
+  FutureOr<T> unwrapOrCompute(FutureOr<T> Function() defaultValue) async =>
+      switch (this) {
         Success(result: final r) => r,
         Fail() => await defaultValue(),
       };
@@ -733,7 +735,8 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
           : TurboResponse.fail(
               error: error ?? Exception('Validation failed'),
               title: title ?? 'Validation Error',
-              message: message ?? 'The success value did not meet the required condition',
+              message: message ??
+                  'The success value did not meet the required condition',
             );
     }
     return this;
@@ -752,7 +755,8 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   (item) => validateItem(item),
   /// );
   /// ```
-  static Future<TurboResponse<List<R>>> traverse<T extends Object, R extends Object>(
+  static Future<TurboResponse<List<R>>>
+      traverse<T extends Object, R extends Object>(
     List<T> items,
     Future<TurboResponse<R>> Function(T item) operation,
   ) async {

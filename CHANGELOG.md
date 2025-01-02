@@ -1,3 +1,8 @@
+## 0.1.0+1
+
+* Updated repository URLs to point to the correct GitHub repository
+* Fixed formatting issues in turbo_response.dart
+
 ## 0.1.0
 
 * Initial release
