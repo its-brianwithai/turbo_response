@@ -300,7 +300,7 @@ final class Fail<T> extends TurboResponse<T> {
     this.message,
   }) : super._();
 
-  /// Creates a fail state with just a default error object.
+  /// Creates a fail state with a default error.
   const Fail.empty()
       : error = const _DefaultError(),
         stackTrace = null,
@@ -357,7 +357,7 @@ class _DefaultError {
 }
 
 /// Extension methods for TurboResponse
-extension TurboResponseX<T extends Object> on TurboResponse<T> {
+extension TurboResponseX<T> on TurboResponse<T> {
   /// Whether this response represents a success state.
   bool get isSuccess => this is Success<T>;
 
@@ -430,8 +430,7 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   (s) => 'Success: ${s.result}',
   /// );
   /// ```
-  FutureOr<R?> whenSuccess<R>(
-          FutureOr<R> Function(Success<T> ok) success) async =>
+  FutureOr<R?> whenSuccess<R>(FutureOr<R> Function(Success<T> ok) success) async =>
       isSuccess ? await success(this as Success<T>) : null;
 
   /// Handles a failed response, returning a value.
@@ -476,7 +475,7 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   (s) => s.result.length,
   /// );
   /// ```
-  FutureOr<TurboResponse<R>> mapSuccess<R extends Object>(
+  FutureOr<TurboResponse<R>> mapSuccess<R>(
     FutureOr<R> Function(T) transform,
   ) async =>
       await when(
@@ -565,8 +564,7 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   () => computeExpensiveDefault(),
   /// );
   /// ```
-  FutureOr<T> unwrapOrCompute(FutureOr<T> Function() defaultValue) async =>
-      switch (this) {
+  FutureOr<T> unwrapOrCompute(FutureOr<T> Function() defaultValue) async => switch (this) {
         Success(result: final r) => r,
         Fail() => await defaultValue(),
       };
@@ -609,7 +607,7 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   ///   .andThen((value) => computeNext(value))
   ///   .andThen((value) => validateResult(value));
   /// ```
-  FutureOr<TurboResponse<R>> andThen<R extends Object>(
+  FutureOr<TurboResponse<R>> andThen<R>(
     FutureOr<TurboResponse<R>> Function(T value) operation,
   ) async =>
       await when(
@@ -631,7 +629,7 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   /// ```dart
   /// final stringResponse = response.cast<String>();
   /// ```
-  TurboResponse<R> cast<R extends Object>() {
+  TurboResponse<R> cast<R>() {
     if (this is Success<T>) {
       final success = this as Success<T>;
       try {
@@ -684,9 +682,10 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
   /// ```
   Fail<T>? get asFail => isFail ? this as Fail<T> : null;
 
-  /// Swaps a success state to a fail state and vice versa.
+  /// Swaps the success and fail states of this response.
   ///
-  /// This is useful when you want to invert the meaning of success and failure.
+  /// In a success state, the result becomes the error of a new fail state.
+  /// In a fail state, the error becomes the result of a new success state.
   ///
   /// Example:
   /// ```dart
@@ -696,14 +695,14 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
     if (this is Success<T>) {
       final success = this as Success<T>;
       return TurboResponse.fail(
-        error: success.result,
+        error: success.result ?? const _DefaultError(),
         title: success.title,
         message: success.message,
       );
     } else {
       final fail = this as Fail<T>;
       return TurboResponse.success(
-        result: fail.error as T,
+        result: fail.error is T ? fail.error as T : const _DefaultSuccess() as T,
         title: fail.title,
         message: fail.message,
       );
@@ -735,84 +734,70 @@ extension TurboResponseX<T extends Object> on TurboResponse<T> {
           : TurboResponse.fail(
               error: error ?? Exception('Validation failed'),
               title: title ?? 'Validation Error',
-              message: message ??
-                  'The success value did not meet the required condition',
+              message: message ?? 'The success value did not meet the required condition',
             );
     }
     return this;
   }
 
-  /// Traverses a list by applying a function that returns a TurboResponse to each element.
+  /// Traverses a list of items, applying an operation to each one.
   ///
-  /// Returns a TurboResponse containing a list of results if all operations succeed,
-  /// or the first failure encountered.
+  /// Returns a [TurboResponse] containing a list of results if all operations
+  /// succeed, or the first failure encountered.
   ///
   /// Example:
   /// ```dart
-  /// final items = ['a', 'b', 'c'];
   /// final result = await TurboResponseX.traverse(
   ///   items,
-  ///   (item) => validateItem(item),
+  ///   (item) => processItem(item),
   /// );
   /// ```
-  static Future<TurboResponse<List<R>>>
-      traverse<T extends Object, R extends Object>(
+  static Future<TurboResponse<List<R>>> traverse<T, R>(
     List<T> items,
     Future<TurboResponse<R>> Function(T item) operation,
   ) async {
     final results = <R>[];
-
     for (final item in items) {
       final result = await operation(item);
-      final failResult = await result.whenFail((f) => f);
-
-      if (failResult != null) {
+      if (result case Fail(:final error, :final title, :final message)) {
         return TurboResponse.fail(
-          error: failResult.error,
-          stackTrace: failResult.stackTrace,
-          title: failResult.title,
-          message: failResult.message,
+          error: error,
+          title: title,
+          message: message,
         );
+      } else if (result case Success(:final result)) {
+        results.add(result);
       }
-
-      results.add(result.unwrap());
     }
-
     return TurboResponse.success(result: results);
   }
 
-  /// Converts a list of TurboResponse into a TurboResponse containing a list.
+  /// Combines a list of responses into a single response containing a list.
   ///
-  /// Returns a success with all results if all responses are successful,
-  /// or the first failure encountered.
+  /// If all responses are successful, returns a success response with a list
+  /// of all results. If any response is a failure, returns the first failure
+  /// encountered.
   ///
   /// Example:
   /// ```dart
-  /// final responses = [
-  ///   TurboResponse.success(result: 1),
-  ///   TurboResponse.success(result: 2),
-  ///   TurboResponse.success(result: 3),
-  /// ];
-  /// final result = TurboResponseX.sequence(responses);
+  /// final responses = [response1, response2, response3];
+  /// final combined = TurboResponseX.sequence(responses);
   /// ```
-  static TurboResponse<List<T>> sequence<T extends Object>(
+  static TurboResponse<List<T>> sequence<T>(
     List<TurboResponse<T>> responses,
   ) {
     final results = <T>[];
-
     for (final response in responses) {
-      if (response.isFail) {
-        final fail = response as Fail<T>;
+      if (response case Fail(:final error, :final title, :final message)) {
         return TurboResponse.fail(
-          error: fail.error,
-          stackTrace: fail.stackTrace,
-          title: fail.title,
-          message: fail.message,
+          error: error,
+          title: title,
+          message: message,
         );
+      } else if (response case Success(:final result)) {
+        results.add(result);
       }
-      results.add(response.unwrap());
     }
-
     return TurboResponse.success(result: results);
   }
 }

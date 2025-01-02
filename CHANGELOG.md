@@ -1,3 +1,8 @@
+## 0.2.0
+
+* BREAKING: Removed `extends Object` constraint from `TurboResponseX` extension to allow for more flexible type handling
+* Fixed issue with `isSuccess` getter not being accessible for `TurboResponse<void>`
+
 ## 0.1.0+1
 
 * Updated repository URLs to point to the correct GitHub repository
