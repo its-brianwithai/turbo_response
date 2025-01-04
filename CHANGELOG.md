@@ -1,25 +1,29 @@
+# Changelog
+
+## 0.2.3
+
+* **✨ New:** Added static `throwFail` method for creating and throwing failures in one step
+
+## 0.2.2
+
+* **🔄 Changed:** Renamed `throwFail` to `tryThrowFail` for better clarity
+
+## 0.2.1
+
+* **🔄 Changed:** Updated package description to be more concise
+* **📝 Docs:** Enhanced documentation with emojis and better formatting
+
 ## 0.2.0
 
-* BREAKING: Removed `extends Object` constraint from `TurboResponseX` extension to allow for more flexible type handling
-* Fixed issue with `isSuccess` getter not being accessible for `TurboResponse<void>`
-
-## 0.1.0+1
-
-* Updated repository URLs to point to the correct GitHub repository
-* Fixed formatting issues in turbo_response.dart
+* **✨ New:** Added support for async operations in `mapSuccess` and `andThen` methods
+* **🔄 Changed:** Updated function parameter names to be more descriptive in IDE tooltips
+* **📝 Docs:** Improved documentation with better examples and parameter names
 
 ## 0.1.0
 
-* Initial release
-* Added `TurboResponse` sealed class with `Success` and `Fail` variants
-* Added pattern matching support with `when` and `maybeWhen`
-* Added convenience methods `whenSuccess` and `whenFail` for single-state handling
-* Added functional transformations with `fold`, `mapSuccess`, and `mapFail`
-* Added value extraction with `unwrap`, `unwrapOr`, and `unwrapOrCompute`
-* Added error recovery with `recover` and `andThen`
-* Added property getters for `result`, `title`, `message`, and `error`
-* Added `throwFail` method for Firestore transaction support
-* Added comprehensive test coverage
-* Added improved debugging support with custom `toString` implementation
-* Made `result` getter non-nullable and throw `TurboException` in fail state
-* Made `error` optional in `TurboException` with `hasError`, `hasTitle`, and `hasMessage` getters
+* Initial release with core functionality
+* Added support for success and failure states
+* Added pattern matching with `when` and `maybeWhen`
+* Added transformation methods like `mapSuccess`, `mapFail`, and `andThen`
+* Added utility methods like `unwrap`, `unwrapOr`, and `ensure`
+* Added static utility methods `traverse` and `sequence`

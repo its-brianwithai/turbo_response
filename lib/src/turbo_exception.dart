@@ -6,7 +6,7 @@
 /// Example:
 /// ```dart
 /// try {
-///   response.throwFail();
+///   response.tryThrowFail();
 /// } on TurboException catch (e) {
 ///   print('Title: ${e.title}');
 ///   print('Message: ${e.message}');

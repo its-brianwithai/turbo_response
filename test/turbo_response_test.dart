@@ -62,8 +62,8 @@ void main() {
       expect(exceptionWithoutError.hasTitle, isTrue);
       expect(exceptionWithoutError.hasMessage, isTrue);
       expect(exceptionWithoutError.hasError, isFalse);
-      expect(
-          exceptionWithoutError.toString(), equals('TurboException(Error Title)\nError Message'));
+      expect(exceptionWithoutError.toString(),
+          equals('TurboException(Error Title)\nError Message'));
     });
 
     test('when should handle all states correctly', () {
@@ -320,7 +320,7 @@ void main() {
       });
     });
 
-    group('throwFail', () {
+    group('tryThrowFail', () {
       test('should throw TurboException with all properties', () {
         final error = Exception('Test error');
         final stackTrace = StackTrace.current;
@@ -332,7 +332,7 @@ void main() {
         );
 
         expect(
-          () => state.throwFail(),
+          () => state.tryThrowFail(),
           throwsA(
             isA<TurboException>()
                 .having((e) => e.error, 'error', error)
@@ -350,7 +350,7 @@ void main() {
         );
 
         expect(
-          () => state.throwFail(),
+          () => state.tryThrowFail(),
           throwsA(
             isA<TurboException>()
                 .having((e) => e.error, 'error', error)
@@ -367,7 +367,7 @@ void main() {
           title: 'Success',
         );
 
-        expect(() => state.throwFail(), returnsNormally);
+        expect(() => state.tryThrowFail(), returnsNormally);
       });
 
       test('TurboException should have correct string representation', () {
@@ -642,7 +642,8 @@ void main() {
         final items = ['a', 'b', 'c'];
         final result = await TurboResponseX.traverse(
           items,
-          (item) async => TurboResponse<String>.success(result: item.toUpperCase()),
+          (item) async =>
+              TurboResponse<String>.success(result: item.toUpperCase()),
         );
 
         expect(result.isSuccess, isTrue);

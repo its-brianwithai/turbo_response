@@ -119,7 +119,7 @@ void handleErrors(TurboResponse<int> response) {
   final computed = response.unwrapOrCompute(() => computeDefault());
 
   // Throw error if present
-  response.throwFail();
+  response.tryThrowFail();
 }
 ```
 

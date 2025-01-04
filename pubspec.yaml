@@ -1,7 +1,7 @@
 name: turbo_response
-description: A type-safe response handling library for Dart and Flutter, providing a sealed class hierarchy for handling success and failure states.
-version: 0.2.0
-repository: https://github.com/ultrawideturbodev/turbo_response
+description: A type-safe response that can be either successful or failed, with proper error handling and pattern matching.
+version: 0.2.3
+repository: https://github.com/codaveto/turbo_response
 issue_tracker: https://github.com/ultrawideturbodev/turbo_response/issues
 homepage: https://github.com/ultrawideturbodev/turbo_response
 
