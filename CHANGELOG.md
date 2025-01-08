@@ -2,9 +2,10 @@
 
 ## 0.2.4
 
-* **🔄 Changed:** Made Flutter an optional dependency - now works with pure Dart projects
-* **📝 Docs:** Updated documentation to reflect Dart compatibility
-* **🎨 Platform:** Added platform-agnostic support indicator
+* **🔄 Changed:** Moved Flutter to dev_dependencies - now works with pure Dart projects with zero Flutter dependencies
+* **📝 Docs:** Enhanced documentation to highlight Dart compatibility
+* **🎨 Platform:** Added platform-agnostic support with improved package structure
+* **🔧 Chore:** Updated package metadata and topics
 
 ## 0.2.3
 
