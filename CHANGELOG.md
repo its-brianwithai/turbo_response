@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+* **🔄 Changed:** Made Flutter an optional dependency - now works with pure Dart projects
+* **📝 Docs:** Updated documentation to reflect Dart compatibility
+* **🎨 Platform:** Added platform-agnostic support indicator
+
 ## 0.2.3
 
 * **✨ New:** Added static `throwFail` method for creating and throwing failures in one step

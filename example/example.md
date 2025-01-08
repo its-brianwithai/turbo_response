@@ -1,6 +1,6 @@
 # TurboResponse Examples
 
-This document provides examples of how to use the `turbo_response` package in various scenarios.
+This document provides examples of how to use the `turbo_response` package in various scenarios. All examples work in both pure Dart and Flutter projects.
 
 ## Basic Usage
 

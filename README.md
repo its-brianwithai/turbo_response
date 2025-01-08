@@ -1,6 +1,6 @@
 # TurboResponse
 
-A type-safe response that can be either successful or failed, with proper error handling and pattern matching.
+A type-safe response that can be either successful or failed, with proper error handling and pattern matching. Works with both pure Dart and Flutter projects.
 
 ## Features
 
@@ -10,6 +10,7 @@ A type-safe response that can be either successful or failed, with proper error 
 - ⚡ Async operation support
 - 🎁 Utility methods like `unwrap`, `unwrapOr`, and `ensure`
 - 🔗 Static utility methods `traverse` and `sequence`
+- 🎨 Platform agnostic - works with both Dart and Flutter
 
 ## Usage
 
@@ -92,8 +93,10 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  turbo_response: ^0.2.0
+  turbo_response: ^0.2.3
 ```
+
+You can use this package with both pure Dart and Flutter projects. No additional setup required!
 
 ## Additional information
 
