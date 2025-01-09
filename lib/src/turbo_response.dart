@@ -80,24 +80,38 @@ sealed class TurboResponse<T> {
   /// Creates a failed response with a default error.
   ///
   /// This is a convenience constructor that creates a fail state with a default error.
+  /// Optional [title] and [message] parameters can provide additional context.
   /// Useful when you just want to indicate failure without specific error details.
   ///
   /// Example:
   /// ```dart
-  /// final response = TurboResponse.failed();
+  /// final response = TurboResponse<int>.emptyFail(
+  ///   title: 'Operation Failed',
+  ///   message: 'The operation could not be completed',
+  /// );
   /// ```
-  const factory TurboResponse.emptyFail() = Fail<T>.empty;
+  const factory TurboResponse.emptyFail({
+    String? title,
+    String? message,
+  }) = Fail<T>.empty;
 
   /// Creates a successful response with a default result value.
   ///
   /// This is a convenience constructor that creates a success state with a default result.
+  /// Optional [title] and [message] parameters can provide additional context.
   /// Useful when you just want to indicate success without specific result details.
   ///
   /// Example:
   /// ```dart
-  /// final response = TurboResponse.emptySuccess();
+  /// final response = TurboResponse<int>.emptySuccess(
+  ///   title: 'Operation Complete',
+  ///   message: 'The operation completed successfully',
+  /// );
   /// ```
-  const factory TurboResponse.emptySuccess() = Success<T>.empty;
+  const factory TurboResponse.emptySuccess({
+    String? title,
+    String? message,
+  }) = Success<T>.empty;
 
   /// Creates and throws a [TurboException] with the provided error details.
   ///
@@ -233,8 +247,8 @@ sealed class TurboResponse<T> {
 /// Represents a successful response with a result value.
 ///
 /// The [Success] class is one of two possible states of a [TurboResponse].
-/// It contains a required [result] value of type [T], and optional [title]
-/// and [message] fields for additional context.
+/// It contains an optional [result] value (defaults to [_DefaultSuccess]), and optional
+/// [title] and [message] fields for additional context.
 ///
 /// Example:
 /// ```dart
@@ -249,6 +263,7 @@ sealed class TurboResponse<T> {
 /// * [TurboResponse], the sealed class that defines the response type
 /// * [Fail], the alternative state representing a failure
 final class Success<T> extends TurboResponse<T> {
+  /// Creates a success state with a result value.
   const Success({
     required this.result,
     this.title,
@@ -256,10 +271,10 @@ final class Success<T> extends TurboResponse<T> {
   }) : super._();
 
   /// Creates a success state with a default result value.
-  const Success.empty()
-      : result = const _DefaultSuccess() as T,
-        title = null,
-        message = null,
+  const Success.empty({
+    this.title,
+    this.message,
+  })  : result = const _DefaultSuccess() as T,
         super._();
 
   @override
@@ -297,27 +312,32 @@ final class Success<T> extends TurboResponse<T> {
   int get hashCode => Object.hash(result, title, message);
 }
 
-/// Default success value used when no specific result is provided.
+/// Default success object used when no specific result is provided.
 class _DefaultSuccess {
   const _DefaultSuccess();
 
   @override
   String toString() => 'Operation succeeded';
+
+  @override
+  bool operator ==(Object other) => other is _DefaultSuccess;
+
+  @override
+  int get hashCode => 0;
 }
 
 /// Represents a failed response with an error.
 ///
 /// The [Fail] class is one of two possible states of a [TurboResponse].
-/// It contains a required [error] value, an optional [stackTrace] for debugging,
-/// and optional [title] and [message] fields for additional context.
+/// It contains an optional [error] value (defaults to [_DefaultError]), and optional
+/// [stackTrace], [title], and [message] fields for additional context.
 ///
 /// Example:
 /// ```dart
 /// final fail = Fail(
-///   error: Exception('Invalid input'),
-///   stackTrace: StackTrace.current,
-///   title: 'Validation Error',
-///   message: 'The input value was not in the correct format',
+///   error: Exception('Something went wrong'),
+///   title: 'Error',
+///   message: 'Operation failed',
 /// );
 /// ```
 ///
@@ -325,19 +345,21 @@ class _DefaultSuccess {
 /// * [TurboResponse], the sealed class that defines the response type
 /// * [Success], the alternative state representing a success
 final class Fail<T> extends TurboResponse<T> {
+  /// Creates a fail state with an error.
   const Fail({
-    required this.error,
+    Object? error,
     this.stackTrace,
     this.title,
     this.message,
-  }) : super._();
+  })  : error = error ?? const _DefaultError(),
+        super._();
 
   /// Creates a fail state with a default error.
-  const Fail.empty()
-      : error = const _DefaultError(),
+  const Fail.empty({
+    this.title,
+    this.message,
+  })  : error = const _DefaultError(),
         stackTrace = null,
-        title = null,
-        message = null,
         super._();
 
   @override
