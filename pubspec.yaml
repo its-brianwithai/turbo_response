@@ -1,6 +1,6 @@
 name: turbo_response
-description: A type-safe response that can be either successful or failed, with proper error handling and pattern matching. Works with both Dart and Flutter projects.
-version: 0.2.5
+description: A type-safe response wrapper for handling success and failure states with pattern matching and utility methods.
+version: 0.2.6
 repository: https://github.com/codaveto/turbo_response
 issue_tracker: https://github.com/ultrawideturbodev/turbo_response/issues
 homepage: https://github.com/ultrawideturbodev/turbo_response

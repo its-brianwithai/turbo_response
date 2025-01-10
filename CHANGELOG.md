@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6
+
+* **🔄 Changed:** Renamed internal classes for better code organization
+* **🔄 Changed:** Updated method names for better clarity and consistency
+* **📝 Docs:** Enhanced documentation with clearer descriptions
+
 ## 0.2.5
 
 * **✨ New:** Added title and message support for empty responses
