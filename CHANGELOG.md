@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.5
+
+* **✨ New:** Added title and message support for empty responses
+* **🔄 Changed:** Enhanced empty response handling with more descriptive information
+* **🔄 Changed:** Renamed internal classes for better code organization
+* **🔄 Changed:** Updated method names for better clarity and consistency
+
 ## 0.2.4
 
 * **🔄 Changed:** Moved Flutter to dev_dependencies - now works with pure Dart projects with zero Flutter dependencies
@@ -13,7 +20,7 @@
 
 ## 0.2.2
 
-* **🔄 Changed:** Renamed `throwFail` to `tryThrowFail` for better clarity
+* **🔄 Changed:** Renamed `throwFail` to `throwWhenFail` for better clarity
 
 ## 0.2.1
 

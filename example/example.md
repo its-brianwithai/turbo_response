@@ -23,8 +23,8 @@ void main() {
   );
 
   // Create empty responses
-  final emptySuccess = TurboResponse.emptySuccess();
-  final emptyFail = TurboResponse.emptyFail();
+  final successAsBool = TurboResponse.successAsBool();
+  final failAsBool = TurboResponse.failAsBool();
 }
 ```
 
@@ -119,7 +119,7 @@ void handleErrors(TurboResponse<int> response) {
   final computed = response.unwrapOrCompute(() => computeDefault());
 
   // Throw error if present
-  response.tryThrowFail();
+  response.throwWhenFail();
 }
 ```
 

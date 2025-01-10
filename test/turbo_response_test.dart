@@ -82,8 +82,8 @@ void main() {
       expect(exceptionWithoutError.hasTitle, isTrue);
       expect(exceptionWithoutError.hasMessage, isTrue);
       expect(exceptionWithoutError.hasError, isFalse);
-      expect(exceptionWithoutError.toString(),
-          equals('TurboException(Error Title)\nError Message'));
+      expect(
+          exceptionWithoutError.toString(), equals('TurboException(Error Title)\nError Message'));
     });
 
     test('when should handle all states correctly', () {
@@ -340,7 +340,7 @@ void main() {
       });
     });
 
-    group('tryThrowFail', () {
+    group('throwWhenFail', () {
       test('should throw TurboException with all properties', () {
         final error = Exception('Test error');
         final stackTrace = StackTrace.current;
@@ -352,7 +352,7 @@ void main() {
         );
 
         expect(
-          () => state.tryThrowFail(),
+          () => state.throwWhenFail(),
           throwsA(
             isA<TurboException>()
                 .having((e) => e.error, 'error', error)
@@ -370,7 +370,7 @@ void main() {
         );
 
         expect(
-          () => state.tryThrowFail(),
+          () => state.throwWhenFail(),
           throwsA(
             isA<TurboException>()
                 .having((e) => e.error, 'error', error)
@@ -387,7 +387,7 @@ void main() {
           title: 'Success',
         );
 
-        expect(() => state.tryThrowFail(), returnsNormally);
+        expect(() => state.throwWhenFail(), returnsNormally);
       });
 
       test('TurboException should have correct string representation', () {
@@ -662,8 +662,7 @@ void main() {
         final items = ['a', 'b', 'c'];
         final result = await TurboResponseX.traverse(
           items,
-          (item) async =>
-              TurboResponse<String>.success(result: item.toUpperCase()),
+          (item) async => TurboResponse<String>.success(result: item.toUpperCase()),
         );
 
         expect(result.isSuccess, isTrue);
@@ -745,27 +744,28 @@ void main() {
     });
 
     group('empty constructors', () {
-      test('emptySuccess should create success with default result', () {
-        final state = TurboResponse.emptySuccess();
+      test('successAsBool should create success with default result', () {
+        final state = TurboResponse.successAsBool();
         expect(state.isSuccess, isTrue);
         expect(state.result.toString(), equals('Operation succeeded'));
         expect(state.title, isNull);
         expect(state.message, isNull);
       });
 
-      test('emptyFail should create fail with default error', () {
-        final state = TurboResponse.emptyFail();
+      test('failAsBool should create fail with default error', () {
+        final state = TurboResponse.failAsBool();
         expect(state.isFail, isTrue);
-        expect(state.error.toString(), equals('Operation failed'));
+        expect(state.error, isA<TurboException>());
+        expect(state.error.toString(), equals('TurboException: Operation failed'));
         expect(state.title, isNull);
         expect(state.message, isNull);
       });
 
       test('empty states should be equal', () {
-        final success1 = TurboResponse.emptySuccess();
-        final success2 = TurboResponse.emptySuccess();
-        final fail1 = TurboResponse.emptyFail();
-        final fail2 = TurboResponse.emptyFail();
+        final success1 = TurboResponse.successAsBool();
+        final success2 = TurboResponse.successAsBool();
+        final fail1 = TurboResponse.failAsBool();
+        final fail2 = TurboResponse.failAsBool();
 
         expect(success1, equals(success2));
         expect(fail1, equals(fail2));
@@ -774,7 +774,7 @@ void main() {
       });
 
       test('Empty success state should support title and message', () {
-        final state = TurboResponse.emptySuccess(
+        final state = TurboResponse.successAsBool(
           title: 'Success',
           message: 'Operation completed',
         );
@@ -786,7 +786,7 @@ void main() {
       });
 
       test('Empty fail state should support title and message', () {
-        final state = TurboResponse.emptyFail(
+        final state = TurboResponse.failAsBool(
           title: 'Error',
           message: 'Operation failed',
         );

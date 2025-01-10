@@ -85,15 +85,15 @@ sealed class TurboResponse<T> {
   ///
   /// Example:
   /// ```dart
-  /// final response = TurboResponse<int>.emptyFail(
+  /// final response = TurboResponse<int>.failAsBool(
   ///   title: 'Operation Failed',
   ///   message: 'The operation could not be completed',
   /// );
   /// ```
-  const factory TurboResponse.emptyFail({
+  const factory TurboResponse.failAsBool({
     String? title,
     String? message,
-  }) = Fail<T>.empty;
+  }) = Fail<T>.asBool;
 
   /// Creates a successful response with a default result value.
   ///
@@ -103,26 +103,23 @@ sealed class TurboResponse<T> {
   ///
   /// Example:
   /// ```dart
-  /// final response = TurboResponse<int>.emptySuccess(
+  /// final response = TurboResponse<int>.successAsBool(
   ///   title: 'Operation Complete',
   ///   message: 'The operation completed successfully',
   /// );
   /// ```
-  const factory TurboResponse.emptySuccess({
+  const factory TurboResponse.successAsBool({
     String? title,
     String? message,
-  }) = Success<T>.empty;
+  }) = Success<T>.asBool;
 
   /// Creates and throws a [TurboException] with the provided error details.
-  ///
-  /// This is a convenience method that creates a fail state and immediately throws it.
-  /// Useful when you want to throw an exception instead of returning a response.
   ///
   /// Example:
   /// ```dart
   /// try {
   ///   if (!isValid) {
-  ///     TurboResponse.throwFail(
+  ///     TurboResponse.throwException(
   ///       error: 'Invalid state',
   ///       title: 'Validation Error',
   ///       message: 'The state is not valid',
@@ -132,7 +129,7 @@ sealed class TurboResponse<T> {
   ///   print('Caught error: ${e.error}');
   /// }
   /// ```
-  static Never throwFail({
+  static Never throwException({
     Object? error,
     StackTrace? stackTrace,
     String? title,
@@ -184,7 +181,7 @@ sealed class TurboResponse<T> {
   /// Example:
   /// ```dart
   /// try {
-  ///   response.tryThrowFail();
+  ///   response.throwWhenFail();
   /// } on TurboException catch (e) {
   ///   print('Title: ${e.title}');
   ///   print('Message: ${e.message}');
@@ -194,10 +191,10 @@ sealed class TurboResponse<T> {
   /// // Commonly used in transactions:
   /// await transaction.get(doc).then((snapshot) {
   ///   return validateSnapshot(snapshot)
-  ///     ..tryThrowFail(); // Throws and aborts transaction if validation fails
+  ///     ..throwWhenFail(); // Throws and aborts transaction if validation fails
   /// });
   /// ```
-  void tryThrowFail() => switch (this) {
+  void throwWhenFail() => switch (this) {
         Fail(
           error: final e,
           stackTrace: final st,
@@ -244,10 +241,28 @@ sealed class TurboResponse<T> {
       };
 }
 
+/// Default result object used when no specific result is provided.
+class _BoolResult {
+  const _BoolResult({required this.isSuccess});
+
+  final bool isSuccess;
+
+  @override
+  String toString() => isSuccess ? 'Operation succeeded' : 'Operation failed';
+
+  @override
+  bool operator ==(Object other) => other is _BoolResult
+      ? isSuccess == other.isSuccess
+      : other == isSuccess;
+
+  @override
+  int get hashCode => isSuccess.hashCode;
+}
+
 /// Represents a successful response with a result value.
 ///
 /// The [Success] class is one of two possible states of a [TurboResponse].
-/// It contains an optional [result] value (defaults to [_DefaultSuccess]), and optional
+/// It contains an optional [result] value (defaults to [_BoolResult]), and optional
 /// [title] and [message] fields for additional context.
 ///
 /// Example:
@@ -271,10 +286,10 @@ final class Success<T> extends TurboResponse<T> {
   }) : super._();
 
   /// Creates a success state with a default result value.
-  const Success.empty({
+  const Success.asBool({
     this.title,
     this.message,
-  })  : result = const _DefaultSuccess() as T,
+  })  : result = const _BoolResult(isSuccess: true) as T,
         super._();
 
   @override
@@ -312,24 +327,10 @@ final class Success<T> extends TurboResponse<T> {
   int get hashCode => Object.hash(result, title, message);
 }
 
-/// Default success object used when no specific result is provided.
-class _DefaultSuccess {
-  const _DefaultSuccess();
-
-  @override
-  String toString() => 'Operation succeeded';
-
-  @override
-  bool operator ==(Object other) => other is _DefaultSuccess;
-
-  @override
-  int get hashCode => 0;
-}
-
 /// Represents a failed response with an error.
 ///
 /// The [Fail] class is one of two possible states of a [TurboResponse].
-/// It contains an optional [error] value (defaults to [_DefaultError]), and optional
+/// It contains an optional [error] value (defaults to [TurboException]), and optional
 /// [stackTrace], [title], and [message] fields for additional context.
 ///
 /// Example:
@@ -351,14 +352,14 @@ final class Fail<T> extends TurboResponse<T> {
     this.stackTrace,
     this.title,
     this.message,
-  })  : error = error ?? const _DefaultError(),
+  })  : error = error ?? const TurboException(error: 'Operation failed'),
         super._();
 
   /// Creates a fail state with a default error.
-  const Fail.empty({
+  const Fail.asBool({
     this.title,
     this.message,
-  })  : error = const _DefaultError(),
+  })  : error = const TurboException(error: 'Operation failed'),
         stackTrace = null,
         super._();
 
@@ -400,14 +401,6 @@ final class Fail<T> extends TurboResponse<T> {
 
   @override
   int get hashCode => Object.hash(error, stackTrace, title, message);
-}
-
-/// Default error object used when no specific error is provided.
-class _DefaultError {
-  const _DefaultError();
-
-  @override
-  String toString() => 'Operation failed';
 }
 
 /// Extension methods for TurboResponse
@@ -751,15 +744,16 @@ extension TurboResponseX<T> on TurboResponse<T> {
     if (this is Success<T>) {
       final success = this as Success<T>;
       return TurboResponse.fail(
-        error: success.result ?? const _DefaultError(),
+        error: success.result as Object,
         title: success.title,
         message: success.message,
       );
     } else {
       final fail = this as Fail<T>;
       return TurboResponse.success(
-        result:
-            fail.error is T ? fail.error as T : const _DefaultSuccess() as T,
+        result: fail.error is T
+            ? fail.error as T
+            : const TurboException(error: 'Operation failed') as T,
         title: fail.title,
         message: fail.message,
       );

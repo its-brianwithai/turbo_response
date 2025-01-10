@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _throwError() {
     try {
-      _response?.tryThrowFail();
+      _response?.throwWhenFail();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Caught error: $e')),
