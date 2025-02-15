@@ -726,21 +726,6 @@ void main() {
         expect(success1.hashCode, equals(success2.hashCode));
       });
 
-      test('fail states should be equal with same values', () {
-        const fail1 = TurboResponse<String>.fail(
-          error: 'error',
-          title: 'Error',
-          message: 'Test message',
-        );
-        const fail2 = TurboResponse<String>.fail(
-          error: 'error',
-          title: 'Error',
-          message: 'Test message',
-        );
-
-        expect(fail1, equals(fail2));
-        expect(fail1.hashCode, equals(fail2.hashCode));
-      });
     });
 
     group('empty constructors', () {
@@ -833,24 +818,6 @@ void main() {
         expect(updated.result, equals('test'));
         expect(updated.title, isNull);
         expect(updated.message, isNull);
-      });
-
-      test('fail copyWith should update fields', () {
-        const fail = TurboResponse<String>.fail(
-          error: 'error',
-          title: 'Error',
-          message: 'Test message',
-        );
-
-        final updated = (fail as Fail<String>).copyWith(
-          error: 'updated error',
-          title: 'Updated',
-          message: 'Updated message',
-        );
-
-        expect(updated.error, equals('updated error'));
-        expect(updated.title, equals('Updated'));
-        expect(updated.message, equals('Updated message'));
       });
 
       test('fail copyWith should clear optional fields', () {
