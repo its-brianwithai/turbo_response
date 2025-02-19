@@ -20,3 +20,18 @@ dev_dependencies:
     sdk: flutter
   test: ^1.24.0
   lints: ^3.0.0
+
+# The following section is automatically managed by toggle_dependencies.dart
+dependency_overrides:
+  informers:
+    path: ../informers
+  loglytics:
+    path: ../loglytics
+  turbo_firestore_api:
+    path: ../turbo_firestore_api
+  turbo_response:
+    path: 
+  veto:
+    path: ../veto
+  shadcn_flutter:
+    path: ../../forks/shadcn_flutter
