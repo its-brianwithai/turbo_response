@@ -160,13 +160,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 alignment: WrapAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed:
-                        _isLoading ? null : () => _performOperation(true),
+                    onPressed: _isLoading ? null : () => _performOperation(true),
                     child: const Text('Simulate Success'),
                   ),
                   ElevatedButton(
-                    onPressed:
-                        _isLoading ? null : () => _performOperation(false),
+                    onPressed: _isLoading ? null : () => _performOperation(false),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade100,
                     ),

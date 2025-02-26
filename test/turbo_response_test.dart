@@ -725,7 +725,6 @@ void main() {
         expect(success1, equals(success2));
         expect(success1.hashCode, equals(success2.hashCode));
       });
-
     });
 
     group('empty constructors', () {
